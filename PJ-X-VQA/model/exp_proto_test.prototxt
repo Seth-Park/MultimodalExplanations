@@ -1,0 +1,163 @@
+layer {
+  name: "exp_att_feature"
+  type: "Python"
+  top: "exp_att_feature"
+  top: "exp"
+  top: "exp_out"
+  top: "exp_cont_1"
+  top: "exp_cont_2"
+  python_param {
+    module: "exp_data_provider_layer"
+    layer: "ExpDataProviderLayer"
+    param_str: "{\"mode\": \"val\", \"batchsize\": 100}"
+  }
+}
+layer {
+  name: "exp_embed_ba"
+  type: "Embed"
+  bottom: "exp"
+  top: "exp_embed_ba"
+  embed_param {
+    num_output: 300
+    input_dim: 8247
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+  }
+}
+layer {
+  name: "exp_embed"
+  type: "TanH"
+  bottom: "exp_embed_ba"
+  top: "exp_embed"
+}
+layer {
+  name: "exp_lstm1"
+  type: "LSTM"
+  bottom: "exp_embed"
+  bottom: "exp_cont_1"
+  top: "exp_lstm1"
+  recurrent_param {
+    num_output: 2048
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "exp_lstm1_dropped"
+  type: "Dropout"
+  bottom: "exp_lstm1"
+  top: "exp_lstm1_dropped"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "exp_att_resh"
+  type: "Reshape"
+  bottom: "exp_att_feature"
+  top: "exp_att_resh"
+  reshape_param {
+    shape {
+      dim: 1
+      dim: -1
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "exp_att_tiled"
+  type: "Tile"
+  bottom: "exp_att_resh"
+  top: "exp_att_tiled"
+  tile_param {
+    axis: 0
+    tiles: 1
+  }
+}
+layer {
+  name: "exp_eltwise_all"
+  type: "Eltwise"
+  bottom: "exp_lstm1_dropped"
+  bottom: "exp_att_tiled"
+  top: "exp_eltwise_all"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "exp_eltwise_all_sqrt"
+  type: "SignedSqrt"
+  bottom: "exp_eltwise_all"
+  top: "exp_eltwise_all_sqrt"
+}
+layer {
+  name: "exp_eltwise_all_l2"
+  type: "L2Normalize"
+  bottom: "exp_eltwise_all_sqrt"
+  top: "exp_eltwise_all_l2"
+}
+layer {
+  name: "exp_eltwise_all_drop"
+  type: "Dropout"
+  bottom: "exp_eltwise_all_l2"
+  top: "exp_eltwise_all_drop"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "exp_lstm2"
+  type: "LSTM"
+  bottom: "exp_eltwise_all_drop"
+  bottom: "exp_cont_2"
+  top: "exp_lstm2"
+  recurrent_param {
+    num_output: 1024
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "exp_lstm2_dropped"
+  type: "Dropout"
+  bottom: "exp_lstm2"
+  top: "exp_lstm2_dropped"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "exp_prediction"
+  type: "InnerProduct"
+  bottom: "exp_lstm2_dropped"
+  top: "exp_prediction"
+  inner_product_param {
+    num_output: 8247
+    weight_filler {
+      type: "xavier"
+    }
+    axis: 2
+  }
+}
+layer {
+  name: "silence_exp_prediction"
+  type: "Silence"
+  bottom: "exp_prediction"
+}

@@ -1,0 +1,398 @@
+layer {
+  name: "img_feature"
+  type: "Python"
+  top: "img_feature"
+  top: "label"
+  top: "exp"
+  top: "exp_out"
+  top: "exp_cont_1"
+  top: "exp_cont_2"
+  python_param {
+    module: "activity_data_provider_layer"
+    layer: "ActivityDataProviderLayer"
+    param_str: "{\"batchsize\": 104, \"mode\": \"val\"}"
+  }
+}
+layer {
+  name: "att_conv1"
+  type: "Convolution"
+  bottom: "img_feature"
+  top: "att_conv1"
+  convolution_param {
+    num_output: 512
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "att_conv1_relu"
+  type: "ReLU"
+  bottom: "att_conv1"
+  top: "att_conv1_relu"
+}
+layer {
+  name: "att_conv2"
+  type: "Convolution"
+  bottom: "att_conv1_relu"
+  top: "att_conv2"
+  convolution_param {
+    num_output: 1
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "att_reshaped"
+  type: "Reshape"
+  bottom: "att_conv2"
+  top: "att_reshaped"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 196
+    }
+  }
+}
+layer {
+  name: "att_softmax"
+  type: "Softmax"
+  bottom: "att_reshaped"
+  top: "att_softmax"
+  softmax_param {
+    axis: 2
+  }
+}
+layer {
+  name: "att_map"
+  type: "Reshape"
+  bottom: "att_softmax"
+  top: "att_map"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 14
+      dim: 14
+    }
+  }
+}
+layer {
+  name: "DummyData1"
+  type: "DummyData"
+  top: "DummyData1"
+  dummy_data_param {
+    data_filler {
+      type: "constant"
+      value: 1.0
+    }
+    shape {
+      dim: 104
+      dim: 1
+    }
+  }
+}
+layer {
+  name: "att_feature"
+  type: "SoftAttention"
+  bottom: "img_feature"
+  bottom: "att_map"
+  bottom: "DummyData1"
+  top: "att_feature"
+}
+layer {
+  name: "att_feature_resh"
+  type: "Reshape"
+  bottom: "att_feature"
+  top: "att_feature_resh"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "prediction"
+  type: "InnerProduct"
+  bottom: "att_feature_resh"
+  top: "prediction"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  inner_product_param {
+    num_output: 397
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "vqa_ans"
+  type: "ArgMax"
+  bottom: "prediction"
+  top: "vqa_ans"
+  argmax_param {
+    axis: 1
+  }
+}
+layer {
+  name: "exp_emb_ans"
+  type: "Embed"
+  bottom: "vqa_ans"
+  top: "exp_emb_ans"
+  embed_param {
+    num_output: 300
+    input_dim: 397
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+  }
+}
+layer {
+  name: "exp_emb_ans_tanh"
+  type: "TanH"
+  bottom: "exp_emb_ans"
+  top: "exp_emb_ans_tanh"
+}
+layer {
+  name: "exp_emb_ans2"
+  type: "InnerProduct"
+  bottom: "exp_emb_ans_tanh"
+  top: "exp_emb_ans2"
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_emb_resh"
+  type: "Reshape"
+  bottom: "exp_emb_ans2"
+  top: "exp_emb_resh"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 2048
+      dim: 1
+      dim: 1
+    }
+  }
+}
+layer {
+  name: "exp_emb_tiled_1"
+  type: "Tile"
+  bottom: "exp_emb_resh"
+  top: "exp_emb_tiled_1"
+  tile_param {
+    axis: 2
+    tiles: 14
+  }
+}
+layer {
+  name: "exp_emb_tiled"
+  type: "Tile"
+  bottom: "exp_emb_tiled_1"
+  top: "exp_emb_tiled"
+  tile_param {
+    axis: 3
+    tiles: 14
+  }
+}
+layer {
+  name: "img_embed"
+  type: "Convolution"
+  bottom: "img_feature"
+  top: "img_embed"
+  convolution_param {
+    num_output: 2048
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_eltwise"
+  type: "Eltwise"
+  bottom: "img_embed"
+  bottom: "exp_emb_tiled"
+  top: "exp_eltwise"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "exp_eltwise_sqrt"
+  type: "SignedSqrt"
+  bottom: "exp_eltwise"
+  top: "exp_eltwise_sqrt"
+}
+layer {
+  name: "exp_eltwise_l2"
+  type: "L2Normalize"
+  bottom: "exp_eltwise_sqrt"
+  top: "exp_eltwise_l2"
+}
+layer {
+  name: "exp_eltwise_drop"
+  type: "Dropout"
+  bottom: "exp_eltwise_l2"
+  top: "exp_eltwise_drop"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "exp_att_conv1"
+  type: "Convolution"
+  bottom: "exp_eltwise_drop"
+  top: "exp_att_conv1"
+  convolution_param {
+    num_output: 512
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_att_conv1_relu"
+  type: "ReLU"
+  bottom: "exp_att_conv1"
+  top: "exp_att_conv1_relu"
+}
+layer {
+  name: "exp_att_conv2"
+  type: "Convolution"
+  bottom: "exp_att_conv1_relu"
+  top: "exp_att_conv2"
+  convolution_param {
+    num_output: 1
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_att_reshaped"
+  type: "Reshape"
+  bottom: "exp_att_conv2"
+  top: "exp_att_reshaped"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 196
+    }
+  }
+}
+layer {
+  name: "exp_att_softmax"
+  type: "Softmax"
+  bottom: "exp_att_reshaped"
+  top: "exp_att_softmax"
+  softmax_param {
+    axis: 2
+  }
+}
+layer {
+  name: "exp_att_map"
+  type: "Reshape"
+  bottom: "exp_att_softmax"
+  top: "exp_att_map"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 14
+      dim: 14
+    }
+  }
+}
+layer {
+  name: "DummyData2"
+  type: "DummyData"
+  top: "DummyData2"
+  dummy_data_param {
+    data_filler {
+      type: "constant"
+      value: 1.0
+    }
+    shape {
+      dim: 104
+      dim: 1
+    }
+  }
+}
+layer {
+  name: "exp_att_feature_prev"
+  type: "SoftAttention"
+  bottom: "img_feature"
+  bottom: "exp_att_map"
+  bottom: "DummyData2"
+  top: "exp_att_feature_prev"
+}
+layer {
+  name: "exp_att_feature_resh"
+  type: "Reshape"
+  bottom: "exp_att_feature_prev"
+  top: "exp_att_feature_resh"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "exp_att_feature_embed"
+  type: "InnerProduct"
+  bottom: "exp_att_feature_resh"
+  top: "exp_att_feature_embed"
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_att_feature"
+  type: "Eltwise"
+  bottom: "exp_emb_ans2"
+  bottom: "exp_att_feature_embed"
+  top: "exp_att_feature"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "silence_exp_att"
+  type: "Silence"
+  bottom: "exp_att_feature"
+}

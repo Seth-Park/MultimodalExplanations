@@ -1,0 +1,903 @@
+layer {
+  name: "data"
+  type: "Python"
+  top: "data"
+  top: "cont"
+  top: "img_feature"
+  top: "label"
+  top: "exp"
+  top: "exp_out"
+  top: "exp_cont_1"
+  top: "exp_cont_2"
+  python_param {
+    module: "vqa_data_provider_layer"
+    layer: "VQADataProviderLayer"
+    param_str: "{\"mode\": \"val\", \"batchsize\": 100}"
+  }
+}
+layer {
+  name: "embed_ba"
+  type: "Embed"
+  bottom: "data"
+  top: "embed_ba"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  embed_param {
+    num_output: 300
+    input_dim: 13321
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+  }
+}
+layer {
+  name: "embed"
+  type: "TanH"
+  bottom: "embed_ba"
+  top: "embed"
+}
+layer {
+  name: "lstm1"
+  type: "LSTM"
+  bottom: "embed"
+  bottom: "cont"
+  top: "lstm1"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  recurrent_param {
+    num_output: 1024
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "slice_first0"
+  type: "Slice"
+  bottom: "lstm1"
+  top: "slice_first0"
+  top: "slice_first1"
+  top: "slice_first2"
+  top: "slice_first3"
+  top: "slice_first4"
+  top: "slice_first5"
+  top: "slice_first6"
+  top: "slice_first7"
+  top: "slice_first8"
+  top: "slice_first9"
+  top: "slice_first10"
+  top: "slice_first11"
+  top: "slice_first12"
+  top: "slice_first13"
+  top: "lstm1_out"
+  slice_param {
+    axis: 0
+  }
+}
+layer {
+  name: "silence_data_first0"
+  type: "Silence"
+  bottom: "slice_first0"
+}
+layer {
+  name: "silence_data_first1"
+  type: "Silence"
+  bottom: "slice_first1"
+}
+layer {
+  name: "silence_data_first2"
+  type: "Silence"
+  bottom: "slice_first2"
+}
+layer {
+  name: "silence_data_first3"
+  type: "Silence"
+  bottom: "slice_first3"
+}
+layer {
+  name: "silence_data_first4"
+  type: "Silence"
+  bottom: "slice_first4"
+}
+layer {
+  name: "silence_data_first5"
+  type: "Silence"
+  bottom: "slice_first5"
+}
+layer {
+  name: "silence_data_first6"
+  type: "Silence"
+  bottom: "slice_first6"
+}
+layer {
+  name: "silence_data_first7"
+  type: "Silence"
+  bottom: "slice_first7"
+}
+layer {
+  name: "silence_data_first8"
+  type: "Silence"
+  bottom: "slice_first8"
+}
+layer {
+  name: "silence_data_first9"
+  type: "Silence"
+  bottom: "slice_first9"
+}
+layer {
+  name: "silence_data_first10"
+  type: "Silence"
+  bottom: "slice_first10"
+}
+layer {
+  name: "silence_data_first11"
+  type: "Silence"
+  bottom: "slice_first11"
+}
+layer {
+  name: "silence_data_first12"
+  type: "Silence"
+  bottom: "slice_first12"
+}
+layer {
+  name: "silence_data_first13"
+  type: "Silence"
+  bottom: "slice_first13"
+}
+layer {
+  name: "lstm1_reshaped"
+  type: "Reshape"
+  bottom: "lstm1_out"
+  top: "lstm1_reshaped"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1024
+    }
+  }
+}
+layer {
+  name: "lstm1_reshaped_droped"
+  type: "Dropout"
+  bottom: "lstm1_reshaped"
+  top: "lstm1_reshaped_droped"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "lstm1_droped"
+  type: "Dropout"
+  bottom: "lstm1"
+  top: "lstm1_droped"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "lstm2"
+  type: "LSTM"
+  bottom: "lstm1_droped"
+  bottom: "cont"
+  top: "lstm2"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  recurrent_param {
+    num_output: 1024
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "slice_second0"
+  type: "Slice"
+  bottom: "lstm2"
+  top: "slice_second0"
+  top: "slice_second1"
+  top: "slice_second2"
+  top: "slice_second3"
+  top: "slice_second4"
+  top: "slice_second5"
+  top: "slice_second6"
+  top: "slice_second7"
+  top: "slice_second8"
+  top: "slice_second9"
+  top: "slice_second10"
+  top: "slice_second11"
+  top: "slice_second12"
+  top: "slice_second13"
+  top: "lstm2_out"
+  slice_param {
+    axis: 0
+  }
+}
+layer {
+  name: "silence_data_second0"
+  type: "Silence"
+  bottom: "slice_second0"
+}
+layer {
+  name: "silence_data_second1"
+  type: "Silence"
+  bottom: "slice_second1"
+}
+layer {
+  name: "silence_data_second2"
+  type: "Silence"
+  bottom: "slice_second2"
+}
+layer {
+  name: "silence_data_second3"
+  type: "Silence"
+  bottom: "slice_second3"
+}
+layer {
+  name: "silence_data_second4"
+  type: "Silence"
+  bottom: "slice_second4"
+}
+layer {
+  name: "silence_data_second5"
+  type: "Silence"
+  bottom: "slice_second5"
+}
+layer {
+  name: "silence_data_second6"
+  type: "Silence"
+  bottom: "slice_second6"
+}
+layer {
+  name: "silence_data_second7"
+  type: "Silence"
+  bottom: "slice_second7"
+}
+layer {
+  name: "silence_data_second8"
+  type: "Silence"
+  bottom: "slice_second8"
+}
+layer {
+  name: "silence_data_second9"
+  type: "Silence"
+  bottom: "slice_second9"
+}
+layer {
+  name: "silence_data_second10"
+  type: "Silence"
+  bottom: "slice_second10"
+}
+layer {
+  name: "silence_data_second11"
+  type: "Silence"
+  bottom: "slice_second11"
+}
+layer {
+  name: "silence_data_second12"
+  type: "Silence"
+  bottom: "slice_second12"
+}
+layer {
+  name: "silence_data_second13"
+  type: "Silence"
+  bottom: "slice_second13"
+}
+layer {
+  name: "lstm2_reshaped"
+  type: "Reshape"
+  bottom: "lstm2_out"
+  top: "lstm2_reshaped"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1024
+    }
+  }
+}
+layer {
+  name: "lstm2_reshaped_droped"
+  type: "Dropout"
+  bottom: "lstm2_reshaped"
+  top: "lstm2_reshaped_droped"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "lstm_12"
+  type: "Concat"
+  bottom: "lstm1_reshaped_droped"
+  bottom: "lstm2_reshaped_droped"
+  top: "lstm_12"
+}
+layer {
+  name: "q_emb_resh"
+  type: "Reshape"
+  bottom: "lstm_12"
+  top: "q_emb_resh"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 2048
+      dim: 1
+      dim: 1
+    }
+  }
+}
+layer {
+  name: "q_emb_tiled_1"
+  type: "Tile"
+  bottom: "q_emb_resh"
+  top: "q_emb_tiled_1"
+  tile_param {
+    axis: 2
+    tiles: 14
+  }
+}
+layer {
+  name: "q_emb_resh_tiled"
+  type: "Tile"
+  bottom: "q_emb_tiled_1"
+  top: "q_emb_resh_tiled"
+  tile_param {
+    axis: 3
+    tiles: 14
+  }
+}
+layer {
+  name: "i_emb"
+  type: "Convolution"
+  bottom: "img_feature"
+  top: "i_emb"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 2048
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "eltwise"
+  type: "Eltwise"
+  bottom: "q_emb_resh_tiled"
+  bottom: "i_emb"
+  top: "eltwise"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "eltwise_sqrt"
+  type: "SignedSqrt"
+  bottom: "eltwise"
+  top: "eltwise_sqrt"
+}
+layer {
+  name: "eltwise_l2"
+  type: "L2Normalize"
+  bottom: "eltwise_sqrt"
+  top: "eltwise_l2"
+}
+layer {
+  name: "eltwise_drop"
+  type: "Dropout"
+  bottom: "eltwise_l2"
+  top: "eltwise_drop"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "att_conv1"
+  type: "Convolution"
+  bottom: "eltwise_drop"
+  top: "att_conv1"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "att_conv1_relu"
+  type: "ReLU"
+  bottom: "att_conv1"
+  top: "att_conv1_relu"
+}
+layer {
+  name: "att_conv2"
+  type: "Convolution"
+  bottom: "att_conv1_relu"
+  top: "att_conv2"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 1
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "att_reshaped"
+  type: "Reshape"
+  bottom: "att_conv2"
+  top: "att_reshaped"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 196
+    }
+  }
+}
+layer {
+  name: "att_softmax"
+  type: "Softmax"
+  bottom: "att_reshaped"
+  top: "att_softmax"
+  softmax_param {
+    axis: 2
+  }
+}
+layer {
+  name: "att_map"
+  type: "Reshape"
+  bottom: "att_softmax"
+  top: "att_map"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 14
+      dim: 14
+    }
+  }
+}
+layer {
+  name: "DummyData1"
+  type: "DummyData"
+  top: "DummyData1"
+  dummy_data_param {
+    data_filler {
+      type: "constant"
+      value: 1.0
+    }
+    shape {
+      dim: 100
+      dim: 1
+    }
+  }
+}
+layer {
+  name: "att_feature"
+  type: "SoftAttention"
+  bottom: "img_feature"
+  bottom: "att_map"
+  bottom: "DummyData1"
+  top: "att_feature"
+}
+layer {
+  name: "att_feature_resh"
+  type: "Reshape"
+  bottom: "att_feature"
+  top: "att_feature_resh"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "i_emb2"
+  type: "InnerProduct"
+  bottom: "att_feature_resh"
+  top: "i_emb2"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "eltwise2"
+  type: "Eltwise"
+  bottom: "lstm_12"
+  bottom: "i_emb2"
+  top: "eltwise2"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "eltwise2_sqrt"
+  type: "SignedSqrt"
+  bottom: "eltwise2"
+  top: "eltwise2_sqrt"
+}
+layer {
+  name: "eltwise2_l2"
+  type: "L2Normalize"
+  bottom: "eltwise2_sqrt"
+  top: "eltwise2_l2"
+}
+layer {
+  name: "eltwise2_drop"
+  type: "Dropout"
+  bottom: "eltwise2_l2"
+  top: "eltwise2_drop"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "prediction"
+  type: "InnerProduct"
+  bottom: "eltwise2_drop"
+  top: "prediction"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  inner_product_param {
+    num_output: 3000
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_emb_ans"
+  type: "Embed"
+  bottom: "label"
+  top: "exp_emb_ans"
+  embed_param {
+    num_output: 300
+    input_dim: 3000
+    weight_filler {
+      type: "uniform"
+      min: -0.07999999821186066
+      max: 0.07999999821186066
+    }
+  }
+}
+layer {
+  name: "exp_emb_ans_tanh"
+  type: "TanH"
+  bottom: "exp_emb_ans"
+  top: "exp_emb_ans_tanh"
+}
+layer {
+  name: "exp_emb_ans2"
+  type: "InnerProduct"
+  bottom: "exp_emb_ans_tanh"
+  top: "exp_emb_ans2"
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_emb_resh"
+  type: "Reshape"
+  bottom: "exp_emb_ans2"
+  top: "exp_emb_resh"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 2048
+      dim: 1
+      dim: 1
+    }
+  }
+}
+layer {
+  name: "exp_emb_tiled_1"
+  type: "Tile"
+  bottom: "exp_emb_resh"
+  top: "exp_emb_tiled_1"
+  tile_param {
+    axis: 2
+    tiles: 14
+  }
+}
+layer {
+  name: "exp_emb_tiled"
+  type: "Tile"
+  bottom: "exp_emb_tiled_1"
+  top: "exp_emb_tiled"
+  tile_param {
+    axis: 3
+    tiles: 14
+  }
+}
+layer {
+  name: "eltwise_emb"
+  type: "Convolution"
+  bottom: "eltwise"
+  top: "eltwise_emb"
+  convolution_param {
+    num_output: 2048
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_eltwise"
+  type: "Eltwise"
+  bottom: "eltwise_emb"
+  bottom: "exp_emb_tiled"
+  top: "exp_eltwise"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "exp_eltwise_sqrt"
+  type: "SignedSqrt"
+  bottom: "exp_eltwise"
+  top: "exp_eltwise_sqrt"
+}
+layer {
+  name: "exp_eltwise_l2"
+  type: "L2Normalize"
+  bottom: "exp_eltwise_sqrt"
+  top: "exp_eltwise_l2"
+}
+layer {
+  name: "exp_eltwise_drop"
+  type: "Dropout"
+  bottom: "exp_eltwise_l2"
+  top: "exp_eltwise_drop"
+  dropout_param {
+    dropout_ratio: 0.30000001192092896
+  }
+}
+layer {
+  name: "exp_att_conv1"
+  type: "Convolution"
+  bottom: "exp_eltwise_drop"
+  top: "exp_att_conv1"
+  convolution_param {
+    num_output: 512
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_att_conv1_relu"
+  type: "ReLU"
+  bottom: "exp_att_conv1"
+  top: "exp_att_conv1_relu"
+}
+layer {
+  name: "exp_att_conv2"
+  type: "Convolution"
+  bottom: "exp_att_conv1_relu"
+  top: "exp_att_conv2"
+  convolution_param {
+    num_output: 1
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_att_reshaped"
+  type: "Reshape"
+  bottom: "exp_att_conv2"
+  top: "exp_att_reshaped"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 196
+    }
+  }
+}
+layer {
+  name: "exp_att_softmax"
+  type: "Softmax"
+  bottom: "exp_att_reshaped"
+  top: "exp_att_softmax"
+  softmax_param {
+    axis: 2
+  }
+}
+layer {
+  name: "exp_att_map"
+  type: "Reshape"
+  bottom: "exp_att_softmax"
+  top: "exp_att_map"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 1
+      dim: 14
+      dim: 14
+    }
+  }
+}
+layer {
+  name: "DummyData2"
+  type: "DummyData"
+  top: "DummyData2"
+  dummy_data_param {
+    data_filler {
+      type: "constant"
+      value: 1.0
+    }
+    shape {
+      dim: 100
+      dim: 1
+    }
+  }
+}
+layer {
+  name: "exp_att_feature_prev"
+  type: "SoftAttention"
+  bottom: "img_feature"
+  bottom: "exp_att_map"
+  bottom: "DummyData2"
+  top: "exp_att_feature_prev"
+}
+layer {
+  name: "exp_att_feature_resh"
+  type: "Reshape"
+  bottom: "exp_att_feature_prev"
+  top: "exp_att_feature_resh"
+  reshape_param {
+    shape {
+      dim: -1
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "exp_att_feature_embed"
+  type: "InnerProduct"
+  bottom: "exp_att_feature_resh"
+  top: "exp_att_feature_embed"
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_lstm12_embed"
+  type: "InnerProduct"
+  bottom: "lstm_12"
+  top: "exp_lstm12_embed"
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "exp_eltwise2"
+  type: "Eltwise"
+  bottom: "exp_lstm12_embed"
+  bottom: "exp_att_feature_embed"
+  top: "exp_eltwise2"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "exp_att_feature"
+  type: "Eltwise"
+  bottom: "exp_emb_ans2"
+  bottom: "exp_eltwise2"
+  top: "exp_att_feature"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "silence_exp_att"
+  type: "Silence"
+  bottom: "exp_att_feature"
+}
