@@ -30,8 +30,7 @@ def extract_features(target_data, output_data):
     caffe.set_device(config.GPU_ID)
     caffe.set_mode_gpu()
 
-    net = caffe.Net(config.RESNET_LARGE_PROTOTXT_PATH if config.USE_LARGE_INPUT_IMAGES else config.RESNET_PROTOTXT_PATH,
-        config.RESNET_CAFFEMODEL_PATH, caffe.TEST)
+    net = caffe.Net(config.RESNET_LARGE_PROTOTXT_PATH if config.USE_LARGE_INPUT_IMAGES else config.RESNET_PROTOTXT_PATH, config.RESNET_CAFFEMODEL_PATH, caffe.TEST)
     n_data = len(os.listdir(target_path))
 
     # mean substraction
@@ -82,7 +81,8 @@ def extract_features(target_data, output_data):
     print("DONE")
 
 if __name__ == '__main__':
-    extract_features('train2014', config.OUTPUT_PREFIX + 'train2014')
-    extract_features('val2014', config.OUTPUT_PREFIX + 'val2014')
-    extract_features('test2015', config.OUTPUT_PREFIX + 'test2015')
-    extract_features('', config.OUTPUT_PREFIX + '')
+    if config.WHICH_TASK == 'VQA':
+        extract_features('train2014', config.OUTPUT_PREFIX + 'train2014')
+        extract_features('val2014', config.OUTPUT_PREFIX + 'val2014')
+    else:
+        extract_features('', config.OUTPUT_PREFIX + '')

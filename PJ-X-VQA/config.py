@@ -16,8 +16,7 @@ ANSWER_VOCAB_SPACE = 'train'
 EXP_VOCAB_SPACE = 'train'
 
 # VQA pretrained model
-VQA_PRETRAINED = '/data/seth/snapshots/VQA2/_iter_195000.caffemodel'
-#VQA_PRETRAINED = 'PATH_TO_PRETRAINED_VQA_MODEL.caffemodel'
+VQA_PRETRAINED = 'PATH_TO_PRETRAINED_VQA_MODEL.caffemodel'
 
 # location of the data
 VQA_PREFIX = './VQA-X'

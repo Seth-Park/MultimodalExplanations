@@ -1,3 +1,4 @@
+WHICH_TASK = 'VQA' # 'VQA' or 'ACT'
 GPU_ID = 0
 
 # True: resizes images to 448x448. False: resizes images to 224x224
@@ -14,8 +15,8 @@ RESNET_MEAN_PATH = "./ResNet_mean.binaryproto"
 # Download caffemodel from https://github.com/KaimingHe/deep-residual-networks
 RESNET_CAFFEMODEL_PATH = "./ResNet-152-model.caffemodel"
 
-IMAGE_PATH = "path_to_the_images"
-OUTPUT_PATH = "path_to_save_the_features"
+IMAGE_PATH = "path_to_the_image directory"
+OUTPUT_PATH = "path_to_the_directory_to_save_the_features"
 OUTPUT_PREFIX = "resnet_res5c_bgrms_large/"
 
 # Which layer to extract and the size of the layer

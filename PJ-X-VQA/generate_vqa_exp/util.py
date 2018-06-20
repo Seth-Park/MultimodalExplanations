@@ -38,3 +38,9 @@ def batch_to_str(type, batch_idx, batch_cont, r_vdict, r_adict, r_exp_vdict):
     for idxs, cont in zip(batch_idx, batch_cont):
         converted.append(to_str(type, idxs, cont, r_vdict, r_adict, r_exp_vdict))
     return converted
+
+def save_att_map(qid_list, att_maps, save_path):
+    for qid, att_map in zip(qid_list, att_maps):
+        path = os.path.join(save_path, qid)
+        squeezed_map = np.squeeze(att_map)
+        np.save(path, squeezed_map)
