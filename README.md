@@ -110,11 +110,5 @@ The command will save generated textual and visual explanations in the directory
 ```
 cd PJ-X-ACT/generate_act_exp
 python generate_explanation.py --ann_file ../ACT-X/textual/exp_val_split.json --gpu 0 --out_dir ../ACT-X/results --folder ../model --model_path $PATH_TO_CAFFEMODEL --use_gt --save_att_map
-
 ```
-
-
-
-
-
-
+The command will save generated textual and visual explanations in the directory designated by `--our_dir` .
